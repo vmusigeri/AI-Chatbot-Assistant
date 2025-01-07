@@ -1,0 +1,6 @@
+setup.py
+code_assistant.egg-info/PKG-INFO
+code_assistant.egg-info/SOURCES.txt
+code_assistant.egg-info/dependency_links.txt
+code_assistant.egg-info/requires.txt
+code_assistant.egg-info/top_level.txt
