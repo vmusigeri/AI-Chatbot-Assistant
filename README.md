@@ -112,7 +112,8 @@ print(response.json())
 
 
 ## Project Structure
-```project_root/
+```
+project_root/
 │
 ├── backend/
 │ ├── app/
