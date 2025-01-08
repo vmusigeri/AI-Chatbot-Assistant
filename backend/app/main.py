@@ -51,33 +51,134 @@ chat_service = ChatService()
 @app.get("/", response_class=HTMLResponse)
 async def root():
     """
-    Simple HTML interface for the chat bot
+    Enhanced HTML interface for the chat bot with better markdown formatting
     """
     return """
     <!DOCTYPE html>
     <html>
         <head>
             <title>Code Assistant Chat</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
             <style>
-                body { max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; }
-                #chat-container { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
-                #input-container { display: flex; gap: 10px; }
-                #message-input { flex-grow: 1; padding: 10px; }
-                button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-                .message { margin: 10px 0; padding: 10px; border-radius: 5px; }
-                .user-message { background: #e9ecef; }
-                .bot-message { background: #f8f9fa; }
-                pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+                body { 
+                    max-width: 800px; 
+                    margin: 0 auto; 
+                    padding: 20px; 
+                    font-family: Arial, sans-serif;
+                    background-color: #f5f5f5;
+                }
+                #chat-container { 
+                    height: 500px; 
+                    overflow-y: auto; 
+                    border: 1px solid #ddd; 
+                    padding: 20px; 
+                    margin-bottom: 20px;
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                #input-container { 
+                    display: flex; 
+                    gap: 10px;
+                    background-color: white;
+                    padding: 15px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                #message-input { 
+                    flex-grow: 1; 
+                    padding: 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    resize: vertical;
+                }
+                button { 
+                    padding: 12px 24px; 
+                    background: #007bff; 
+                    color: white; 
+                    border: none; 
+                    cursor: pointer;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    transition: background-color 0.3s;
+                }
+                button:hover {
+                    background: #0056b3;
+                }
+                .message { 
+                    margin: 15px 0; 
+                    padding: 15px; 
+                    border-radius: 8px;
+                    max-width: 85%;
+                }
+                .user-message { 
+                    background: #e3f2fd;
+                    margin-left: auto;
+                    border-bottom-right-radius: 2px;
+                }
+                .bot-message { 
+                    background: #f8f9fa;
+                    margin-right: auto;
+                    border-bottom-left-radius: 2px;
+                }
+                pre { 
+                    background: #f8f9fa; 
+                    padding: 12px; 
+                    border-radius: 4px; 
+                    overflow-x: auto;
+                    border: 1px solid #ddd;
+                }
+                code {
+                    font-family: 'Consolas', 'Monaco', monospace;
+                    font-size: 14px;
+                }
+                .message ul, .message ol {
+                    padding-left: 20px;
+                    margin: 10px 0;
+                }
+                .message li {
+                    margin: 5px 0;
+                }
+                .message p {
+                    margin: 10px 0;
+                    line-height: 1.5;
+                }
+                .timestamp {
+                    font-size: 12px;
+                    color: #666;
+                    margin-top: 5px;
+                }
             </style>
         </head>
         <body>
             <h1>Code Assistant Chat</h1>
             <div id="chat-container"></div>
             <div id="input-container">
-                <textarea id="message-input" placeholder="Type your message here..." rows="3"></textarea>
+                <textarea id="message-input" placeholder="Type your message here... (Markdown supported)" rows="3"></textarea>
                 <button onclick="sendMessage()">Send</button>
             </div>
             <script>
+                // Initialize highlight.js
+                hljs.highlightAll();
+                
+                // Configure marked for safe HTML
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    headerIds: false,
+                    mangle: false,
+                    sanitize: false,
+                    highlight: function(code, language) {
+                        if (language && hljs.getLanguage(language)) {
+                            return hljs.highlight(code, { language: language }).value;
+                        }
+                        return hljs.highlightAuto(code).value;
+                    }
+                });
+
                 async function sendMessage() {
                     const input = document.getElementById('message-input');
                     const message = input.value.trim();
@@ -109,22 +210,21 @@ async def root():
                     const messageDiv = document.createElement('div');
                     messageDiv.className = `message ${type}-message`;
                     
-                    // Check if content contains code blocks and format them
-                    if (content.includes('```')) {
-                        const parts = content.split('```');
-                        let formattedContent = parts[0];
-                        for (let i = 1; i < parts.length; i += 2) {
-                            const code = parts[i].trim();
-                            formattedContent += `<pre><code>${code}</code></pre>`;
-                            if (parts[i + 1]) formattedContent += parts[i + 1];
-                        }
-                        messageDiv.innerHTML = formattedContent;
-                    } else {
-                        messageDiv.textContent = content;
-                    }
+                    // Add timestamp
+                    const timestamp = new Date().toLocaleTimeString();
+                    
+                    // Parse markdown and handle code blocks
+                    const formattedContent = marked.parse(content);
+                    
+                    messageDiv.innerHTML = `${formattedContent}<div class="timestamp">${timestamp}</div>`;
                     
                     container.appendChild(messageDiv);
                     container.scrollTop = container.scrollHeight;
+                    
+                    // Highlight code blocks in the new message
+                    messageDiv.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightBlock(block);
+                    });
                 }
 
                 // Handle Enter key
