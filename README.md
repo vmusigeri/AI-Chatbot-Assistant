@@ -42,32 +42,32 @@ cd code-assistant
 2. **Set Up Python Environment**
 
 For Windows:
-bash
+```bash
 python -m venv venv
-venv\Scripts\activate
+venv\Scripts\activate```
 
 
 For macOS/Linux:
-bash:README.md
+```bash:README.md
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate```
 
 
 3. **Install Dependencies**
-bash:README.md
-pip install -r requirements.txt
+```bash:README.md
+pip install -r requirements.txt```
 
 
 4. **Configure Environment**
 
-Create a `.env` file in the project root:
-env
-OPENAI_API_KEY=your_openai_api_key_here
+```Create a `.env` file in the project root:
+.env
+OPENAI_API_KEY=your_openai_api_key_here```
 
 
 5. **Start the Application**
-bash
-python run.py
+```bash
+python run.py```
 
 
 ## Accessing the Application
@@ -81,19 +81,19 @@ After starting, access these URLs:
 
 ### Using curl
 bash
-curl -X POST "http://localhost:8000/api/chat" \
+```curl -X POST "http://localhost:8000/api/chat" \
 -H "Content-Type: application/json" \
 -d '{
 "message": "How do I write a hello world program in Python?",
 "context": {
 "code": "print(\"Hello\")"
 }
-}'
+}'```
 
 
 ### Using Python requests
 python
-import requests
+```import requests
 response = requests.post(
 "http://localhost:8000/api/chat",
 json={
@@ -101,11 +101,11 @@ json={
 "context": {"code": "print('Hello')"}
 }
 )
-print(response.json())
+print(response.json())```
 
 
 ## Project Structure
-project_root/
+```project_root/
 │
 ├── backend/
 │ ├── app/
@@ -123,14 +123,14 @@ project_root/
 │ └── init.py
 ├── requirements.txt # Python dependencies
 ├── run.py # Application entry point
-└── .env # Environment variables
+└── .env # Environment variables```
 
 
 ## Development and Testing
 
 ### Running Tests
-bash
-pytest backend/tests/ -v
+```bash
+pytest backend/tests/ -v```
 
 
 ### Development Setup
